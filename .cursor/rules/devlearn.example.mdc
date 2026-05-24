@@ -1,0 +1,27 @@
+---
+description: Enable DevLearn ambient teaching when DEVLEARN.md is present
+globs:
+alwaysApply: true
+---
+
+When `DEVLEARN.md` exists in the project root with `enabled: true`, follow
+`devlearn-teach-while-coding` after substantive edit batches.
+
+Respect `persona` (viber | seasoned | autodetect) and `depth` from DEVLEARN.md.
+- viber → lesson blocks from shared/lesson-block.md
+- seasoned → decision blocks from shared/decision-block.md (whitelist only in vibe depth)
+
+Use shared/lesson-rubric.md before emitting. Update .devlearn/progress.md when progress true.
+
+User overrides: "just ship", "more detail", "less detail", "explain like PR review".
+
+Before >5 file changes with before_big_changes true → offer devlearn-before-you-ship.
+
+Suggest: devlearn-explain-diff, devlearn-recap, devlearn-debugging, devlearn-onboard,
+devlearn-react, devlearn-next when stack matches.
+
+Ship lifecycle (see shared/ship-lifecycle.md):
+- ready to release → devlearn-pre-ship, devlearn-security
+- workflows/Docker → devlearn-devops
+- after live URL → devlearn-post-ship
+- big refactor planned → devlearn-before-you-ship (before editing)

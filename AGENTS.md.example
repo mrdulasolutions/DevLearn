@@ -1,0 +1,36 @@
+# DevLearn (Codex / Agent Skills)
+
+When `DEVLEARN.md` exists in this project with `enabled: true`, follow the **devlearn-teach-while-coding** skill after substantive code changes.
+
+## Config
+
+Read `DEVLEARN.md` for:
+
+- `persona` — viber | seasoned | autodetect
+- `depth` — vibe | curious | deep
+- `lifecycle.*` — pre-ship, security, post-ship, devops flags
+
+## Teaching rules
+
+- **Viber:** emit lesson blocks (What / Why / How) from `shared/lesson-block.md`
+- **Seasoned:** emit decision blocks only for architecture, security, deps, breaking changes — or when user says "explain like PR review"
+- **Overrides:** "just ship" → no lesson; "more detail" / "less detail" → adjust depth
+
+## Explicit skills (invoke by name)
+
+| Goal | Skill name |
+|------|------------|
+| First-time setup | devlearn-onboard |
+| Explain a diff | devlearn-explain-diff |
+| Session recap | devlearn-recap |
+| Learning path | devlearn-curriculum-router |
+| Errors | devlearn-debugging |
+| Release checklist | devlearn-pre-ship |
+| Security pass | devlearn-security |
+| Deploy | devlearn-deploy |
+| Post-deploy verify | devlearn-post-ship |
+| CI/CD | devlearn-devops |
+
+Install skills: `git clone https://github.com/mrdulasolutions/DevLearn.git && cd DevLearn && ./install.sh --agent codex`
+
+Copy this file to your project root as `AGENTS.md` and customize if needed.
