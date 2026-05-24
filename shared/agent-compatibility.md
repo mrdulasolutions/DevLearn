@@ -21,26 +21,32 @@ OpenCode also discovers skills in `~/.claude/skills/` and `~/.agents/skills/` �
 git clone https://github.com/mrdulasolutions/DevLearn.git && cd DevLearn && ./install.sh
 ```
 
-Interactive menu picks your agent(s). Non-interactive examples:
+Interactive wizard picks your agent(s) and saves settings to `~/.devlearn/install.conf`. Non-interactive examples:
 
 ```bash
-# Cursor only (default)
-./install.sh --no-prompt --agent cursor --verify
+# Cursor only (default when --no-prompt)
+./install.sh --no-prompt --harnesses cursor --verify
 
 # Claude Code
-./install.sh --no-prompt --agent claude --verify
+./install.sh --no-prompt --harnesses claude --verify
 
 # Codex / Agent Skills spec (~/.agents/skills)
-./install.sh --no-prompt --agent codex --verify
+./install.sh --no-prompt --harnesses codex --verify
 
 # OpenCode native path
-./install.sh --no-prompt --agent opencode --verify
+./install.sh --no-prompt --harnesses opencode --verify
 
-# All common paths (Cursor + Claude + Agents + OpenCode)
+# Multiple harnesses
+./install.sh --no-prompt --harnesses cursor,claude,codex,opencode --verify
+
+# Legacy: all common paths
 ./install.sh --no-prompt --agent all --verify
 
-# Auto-detect installed CLIs
-./install.sh --no-prompt --agent auto --verify
+# Piped curl (always clones to ~/DevLearn — never uses cwd)
+curl -fsSL https://raw.githubusercontent.com/mrdulasolutions/DevLearn/main/install.sh | bash -s -- --no-prompt --harnesses cursor --verify
+
+# Re-link after moving repo or upgrading skills
+./install.sh --repair
 
 # Team project: config + repo-local skills for Codex/OpenCode
 ./install.sh --project ~/code/my-app --copy-agents --project-skills --verify
@@ -98,6 +104,7 @@ Run `./scripts/validate-skills.sh` before release.
 
 | Problem | Fix |
 |---------|-----|
+| Installer shows `Repo: /Users` | Use piped `curl \| bash` (clones to `~/DevLearn`) or run from a DevLearn clone; re-run with `--method git` |
 | Skill not listed | Re-run `./install.sh --verify`; restart agent / new session |
 | `../shared/` not found | Re-install — `shared` symlink missing in skills dir |
 | Lessons not ambient | Add `DEVLEARN.md` with `enabled: true`; Cursor needs rule too |

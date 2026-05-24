@@ -4,7 +4,7 @@
 
 DevLearn is a curriculum of **fat agent skills** for **Cursor, Claude Code, Codex, OpenCode**, and other Agent Skills–compatible tools. They explain **what**, **why**, and **how** as the agent builds, fixes, ships, and connects your project — tuned for **vibe coders** and **seasoned developers** alike.
 
-**Multi-agent install:** `./install.sh --agent all` (or `codex`, `opencode`, `claude`, `auto`). See [shared/agent-compatibility.md](shared/agent-compatibility.md).
+**Multi-agent install:** `./install.sh` (interactive wizard) or `./install.sh --harnesses cursor,codex,opencode`. See [shared/agent-compatibility.md](shared/agent-compatibility.md).
 
 ## What's new in v2
 
@@ -88,23 +88,32 @@ cd DevLearn
 ./install.sh
 ```
 
-The installer walks you through:
+The installer is a **6-step wizard** that saves settings to `~/.devlearn/install.conf` for upgrades and repair:
 
-- **Where to install** — Cursor, Claude Code, Codex (`~/.agents/skills`), OpenCode, all, or auto-detect
-- **Optional project setup** — `DEVLEARN.md`, Cursor rule, Codex `AGENTS.md`, repo-local `.agents/skills`
-- **Verification** — checks skills + `shared/` + frontmatter spec
+1. **Welcome** — upgrade, change settings, uninstall, or fresh install if config exists
+2. **Locate or clone** — finds a valid repo or clones to `~/DevLearn` (piped `curl | bash` always clones)
+3. **Harnesses** — pick one or many: Cursor, Claude, Codex, OpenCode, Factory, Kiro
+4. **Project setup** — optional `DEVLEARN.md`, Cursor rule, Codex `AGENTS.md`, repo-local `.agents/skills`
+5. **Review plan** — shows repo, targets, and symlink paths
+6. **Install + verify** — links skills + `shared/`, validates frontmatter spec
 
 Non-interactive examples:
 
 ```bash
-# All common agent paths
-curl -fsSL https://raw.githubusercontent.com/mrdulasolutions/DevLearn/main/install.sh | bash -s -- --no-prompt --agent all --verify
+# Piped install (clones to ~/DevLearn, installs Cursor)
+curl -fsSL https://raw.githubusercontent.com/mrdulasolutions/DevLearn/main/install.sh | bash -s -- --no-prompt --harnesses cursor --verify
 
-# Codex / Agent Skills spec only
-./install.sh --no-prompt --agent codex --verify
+# Multiple harnesses from a local clone
+./install.sh --no-prompt --method local --harnesses cursor,codex,opencode --verify
 
 # Team project (Codex + Cursor)
 ./install.sh --project ~/code/my-app --copy-rule --copy-agents --project-skills --verify
+
+# Re-link from saved config
+./install.sh --repair
+
+# Change saved harnesses / project without full reinstall
+./install.sh --settings
 ```
 
 No local clone? The curl command **clones DevLearn to `~/DevLearn`** and symlinks skills automatically.
@@ -113,24 +122,33 @@ No local clone? The curl command **clones DevLearn to `~/DevLearn`** and symlink
 
 | Flag | Purpose |
 |------|---------|
-| `--agent TARGET` | `cursor`, `claude`, `codex`, `opencode`, `agents`, `all`, `auto`, `both`, `custom` |
+| `--harnesses LIST` | Comma-separated: `cursor`, `claude`, `codex`, `opencode`, `factory`, `kiro`, or `all` |
+| `--agent TARGET` | Legacy alias for `--harnesses` (`all`, `auto`, `cursor`, `codex`, …) |
+| `--method auto\|local\|git` | Auto-detect repo, use script directory, or clone/update |
+| `--git-dir ~/DevLearn` | Clone destination (default `~/DevLearn`) |
 | `--project ~/code/my-app` | Copy `DEVLEARN.md` into a project |
 | `--copy-rule` | Cursor rule → `.cursor/rules/devlearn.mdc` |
 | `--copy-agents` | Codex `AGENTS.md` from template |
 | `--project-skills` | Link skills → `project/.agents/skills` |
+| `--settings` | Interactive settings menu (uses saved config) |
+| `--repair` | Re-link symlinks from saved config |
+| `--uninstall` | Remove symlinks only (keeps config) |
+| `--reset` | Delete config and run fresh wizard |
 | `--verify` | Post-install + spec validation |
 | `--no-prompt` | Non-interactive |
 | `--dry-run` | Show plan only |
 | `--help` | Full usage |
+
+Saved config: `~/.devlearn/install.conf`
 
 Platform details: [shared/agent-compatibility.md](shared/agent-compatibility.md)
 
 ### Manual install (advanced)
 
 ```bash
-./install.sh --agent cursor --verify
+./install.sh --harnesses cursor --verify
 # or legacy path:
-./scripts/install.sh --no-prompt --agent claude
+./scripts/install.sh --no-prompt --harnesses claude
 ```
 
 ## Personas & depth
