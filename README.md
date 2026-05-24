@@ -109,8 +109,8 @@ curl -fsSL https://raw.githubusercontent.com/mrdulasolutions/DevLearn/main/insta
 # Team project (Codex + Cursor)
 ./install.sh --project ~/code/my-app --copy-rule --copy-agents --project-skills --verify
 
-# Re-link from saved config
-./install.sh --repair
+# After git pull — relink skills (no config required if run from clone)
+cd ~/DevLearn && git pull && ./install.sh --repair
 
 # Change saved harnesses / project without full reinstall
 ./install.sh --settings
@@ -131,7 +131,7 @@ No local clone? The curl command **clones DevLearn to `~/DevLearn`** and symlink
 | `--copy-agents` | Codex `AGENTS.md` from template |
 | `--project-skills` | Link skills → `project/.agents/skills` |
 | `--settings` | Interactive settings menu (uses saved config) |
-| `--repair` | Re-link symlinks from saved config |
+| `--repair` / `--upgrade` | Re-link skills after `git pull` (uses config, symlinks, or local clone) |
 | `--uninstall` | Remove symlinks only (keeps config) |
 | `--reset` | Delete config and run fresh wizard |
 | `--verify` | Post-install + spec validation |

@@ -4,7 +4,8 @@
 #
 #   ./install.sh                    Interactive wizard
 #   ./install.sh --settings         Change saved harnesses / paths
-#   ./install.sh --repair           Relink from saved config
+#   ./install.sh --repair           Relink skills (uses saved config or auto-detect)
+#   ./install.sh --upgrade          Same as --repair
 #   ./install.sh --uninstall        Remove DevLearn symlinks only
 #
 #   curl -fsSL .../install.sh | bash
@@ -240,6 +241,90 @@ require_valid_repo() {
   fi
   ui_error "$msg"
   exit 1
+}
+
+# Resolve symlinks to an absolute path (macOS/Linux, no readlink -f required).
+real_path() {
+  local p="$1" dir base target
+  [[ -n "$p" ]] || return 1
+  while [[ -L "$p" ]]; do
+    dir="$(cd "$(dirname "$p")" && pwd)"
+    base="$(basename "$p")"
+    target="$(readlink "$p" 2>/dev/null || true)"
+    [[ -n "$target" ]] || return 1
+    [[ "$target" == /* ]] && p="$target" || p="$dir/$target"
+  done
+  if [[ -d "$p" ]]; then
+    (cd "$p" && pwd -P)
+  else
+    echo "$(cd "$(dirname "$p")" && pwd -P)/$(basename "$p")"
+  fi
+}
+
+# Infer DevLearn repo root from an installed skills directory.
+repo_from_skills_target() {
+  local target="$1" marker="" resolved="" repo=""
+  [[ -d "$target" || -L "$target" ]] || return 1
+  for marker in devlearn-teach-while-coding devlearn-onboard shared; do
+    [[ -e "$target/$marker" ]] || continue
+    resolved="$(real_path "$target/$marker" 2>/dev/null || true)"
+    [[ -n "$resolved" ]] || continue
+    repo="$(dirname "$resolved")"
+    validate_repo_root "$repo" && { echo "$repo"; return 0; }
+  done
+  return 1
+}
+
+# Find harnesses that already have DevLearn symlinks installed.
+detect_harnesses_from_symlinks() {
+  local id path
+  SELECTED_HARNESSES=()
+  for id in "${HARNESS_IDS[@]}"; do
+    path="$(skills_dir_for_harness "$id")"
+    if [[ -e "$path/devlearn-teach-while-coding" || -e "$path/shared" ]]; then
+      SELECTED_HARNESSES+=("$id")
+    fi
+  done
+  [[ ${#SELECTED_HARNESSES[@]} -gt 0 ]]
+}
+
+# Load saved config, or infer repo + harnesses from disk (for --repair after git pull).
+recover_install_state() {
+  local id path repo="" detected=""
+
+  config_exists && config_load && return 0
+
+  map_legacy_agent_target
+  detect_harnesses_from_symlinks || true
+
+  for id in "${HARNESS_IDS[@]}"; do
+    path="$(skills_dir_for_harness "$id")"
+    repo="$(repo_from_skills_target "$path" 2>/dev/null || true)"
+    [[ -n "$repo" ]] && break
+  done
+
+  if [[ -z "$repo" ]]; then
+    detected="$(resolve_script_repo 2>/dev/null || true)"
+    validate_repo_root "$detected" && repo="$detected"
+  fi
+
+  [[ -n "$repo" ]] || return 1
+  REPO_ROOT="$repo"
+  GIT_DIR="$repo"
+
+  if [[ ${#SELECTED_HARNESSES[@]} -eq 0 ]]; then
+    for id in "${HARNESS_IDS[@]}"; do
+      harness_detected "$id" && SELECTED_HARNESSES+=("$id")
+    done
+    [[ ${#SELECTED_HARNESSES[@]} -eq 0 ]] && SELECTED_HARNESSES=(cursor)
+  fi
+
+  return 0
+}
+
+repair_usage_hint() {
+  ui_info "First install: ./install.sh"
+  ui_info "Or non-interactive: ./install.sh --no-prompt --method local --harnesses cursor --verify"
 }
 
 resolve_script_repo() {
@@ -803,7 +888,11 @@ run_install_apply() {
 }
 
 run_uninstall() {
-  config_load || true
+  recover_install_state || {
+    ui_error "No install found — nothing to uninstall"
+    repair_usage_hint
+    exit 1
+  }
   map_legacy_agent_target
   resolve_install_targets
   [[ ${#INSTALL_TARGETS[@]} -gt 0 ]] || {
@@ -819,13 +908,34 @@ run_uninstall() {
 }
 
 run_repair() {
-  config_load || { ui_error "No config at ${DEVLEARN_CONFIG_FILE}"; exit 1; }
+  if recover_install_state; then
+    if ! config_exists; then
+      ui_info "No saved config — recovered install settings from disk"
+    fi
+  else
+    ui_error "Could not recover install settings"
+    repair_usage_hint
+    exit 1
+  fi
+
+  # Prefer the repo we're running from when user did git pull in a clone.
+  local script_repo=""
+  script_repo="$(resolve_script_repo 2>/dev/null || true)"
+  if validate_repo_root "$script_repo"; then
+    if [[ "$script_repo" != "$REPO_ROOT" ]]; then
+      ui_info "Using repo from this checkout: ${script_repo}"
+    fi
+    REPO_ROOT="$script_repo"
+    GIT_DIR="$script_repo"
+  fi
+
   REPO_ROOT="${REPO_ROOT:-$GIT_DIR}"
   validate_repo_root "$REPO_ROOT" || {
     ui_warn "Saved repo invalid — attempting clone/update"
     INSTALL_METHOD="git"
     GIT_DIR="${REPO_ROOT:-$DEVLEARN_DEFAULT_DIR}"
     clone_or_update_repo
+    require_valid_repo "$REPO_ROOT" "Cloned repo failed validation"
   }
   VERIFY=1
   run_install_apply
@@ -859,7 +969,8 @@ DevLearn Installer — guided setup for Cursor, Claude, Codex, OpenCode, etc.
 Usage:
   ./install.sh                      Interactive wizard
   ./install.sh --settings           Change harnesses / paths / re-apply
-  ./install.sh --repair             Relink from saved config
+  ./install.sh --repair             Relink skills (config, symlinks, or local clone)
+  ./install.sh --upgrade            Same as --repair
   ./install.sh --uninstall          Remove symlinks (keeps config)
   ./install.sh --reset              Delete config + fresh wizard
 
@@ -884,7 +995,7 @@ parse_args() {
   while [[ $# -gt 0 ]]; do
     case "$1" in
       --settings) MODE="settings" ;;
-      --repair)   MODE="repair" ;;
+      --repair|--upgrade) MODE="repair" ;;
       --uninstall) MODE="uninstall" ;;
       --reset)    MODE="reset" ;;
       --harnesses)
