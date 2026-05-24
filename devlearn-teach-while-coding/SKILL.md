@@ -112,6 +112,7 @@ See [../shared/ship-lifecycle.md](../shared/ship-lifecycle.md).
 | End of session | `/devlearn-recap` |
 | React/Next code | `/devlearn-react` or `/devlearn-next` |
 | Errors | `/devlearn-debugging` |
+| User pastes URL / "how was this built" | `/devlearn-analyze-website` |
 | Learning path | `/devlearn-curriculum-router` |
 | Ready to release | `/devlearn-pre-ship` → `/devlearn-security` |
 | CI/CD added | `/devlearn-devops` |
@@ -130,11 +131,11 @@ See [../shared/ship-lifecycle.md](../shared/ship-lifecycle.md).
 
 "I don't understand" → stop edits; one term; one question (what / why / where in code).
 
-## All 20 skills (handoff index)
+## All 21 skills (handoff index)
 
 | Category | Skills |
 |----------|--------|
-| Meta | teach-while-coding, explain-diff, glossary, curriculum-router, onboard, recap, before-you-ship, lesson-review |
+| Meta | teach-while-coding, explain-diff, glossary, curriculum-router, onboard, recap, before-you-ship, lesson-review, analyze-website |
 | Fundamentals | html-css, javascript, react, next, apis, git, debugging |
 | Ship lifecycle | pre-ship, security, deploy, post-ship, devops |
 

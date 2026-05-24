@@ -108,6 +108,16 @@ Goal → skill chain → weekend project → depth suggestion.
 | pre-ship, release checklist, ready to merge | devlearn-pre-ship |
 | post deploy, smoke test, prod check, monitoring | devlearn-post-ship |
 | plan refactor, before you code | devlearn-before-you-ship |
+| analyze site, how was built, reverse engineer, learn from url, breakdown page | devlearn-analyze-website |
+
+## How was this site built?
+
+| | |
+|---|---|
+| **Skills** | devlearn-analyze-website → devlearn-html-css → devlearn-javascript |
+| **Project** | Pick a public landing page; analyze layout; rebuild simplified hero in your repo |
+| **Depth** | curious |
+| **Prompt** | "/devlearn-analyze-website — https://example.com — teach me how the hero and nav work. Then help me rebuild a simplified version." |
 
 ## Depth defaults by persona
 

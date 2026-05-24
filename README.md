@@ -187,6 +187,7 @@ Say anytime: **"just ship"**, **"more detail"**, **"explain like PR review"**.
 | [devlearn-explain-diff](devlearn-explain-diff/) | Walk through git diff |
 | [devlearn-glossary](devlearn-glossary/) | Session vocabulary |
 | [devlearn-curriculum-router](devlearn-curriculum-router/) | What to learn next |
+| [devlearn-analyze-website](devlearn-analyze-website/) | Paste a URL — learn how the page was built |
 | [devlearn-debugging](devlearn-debugging/) | Errors & stack traces |
 | [devlearn-git](devlearn-git/) | Commits, branches, PRs |
 | [devlearn-html-css](devlearn-html-css/) | Pages & layout |

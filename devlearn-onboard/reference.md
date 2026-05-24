@@ -53,6 +53,10 @@ Terms learned while building this project. Updated by `/devlearn-glossary` and a
 
 > Help me get this on a public URL. Before deploy run through pre-ship and security. Teach each step. Stack: [vanilla|react|next from detect].
 
+### Learn from a website (curious)
+
+> Analyze https://example.com with `/devlearn-analyze-website`. Teach me how the layout and hero work, then help me rebuild a simplified version with placeholders.
+
 ### Fix something (any persona)
 
 > Here's the error: [paste]. Fix it first, then explain the cause in plain English. Use `/devlearn-debugging`.
